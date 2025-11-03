@@ -1,0 +1,39 @@
+FROM apache/airflow:2.8.1
+
+USER root
+
+# Install postgresql-client for pg_isready
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    postgresql-client \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+USER airflow
+
+# Install Python packages
+RUN pip install --no-cache-dir \
+    requests \
+    pandas \
+    sqlalchemy \
+    psycopg2-binary \
+    matplotlib \
+    scikit-learn
+
+# Copy DAGs and scripts into the image
+COPY --chown=airflow:root dags/ /opt/airflow/dags/
+COPY --chown=airflow:root scripts/ /opt/airflow/scripts/
+
+# Copy entrypoint script
+COPY --chown=airflow:root entrypoint.sh /entrypoint.sh
+
+# Make entrypoint executable
+USER root
+RUN chmod +x /entrypoint.sh
+USER airflow
+
+# Create necessary directories
+RUN mkdir -p /opt/airflow/logs /opt/airflow/data
+
+WORKDIR /opt/airflow
+
+ENTRYPOINT ["/entrypoint.sh"]
