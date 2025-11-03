@@ -1,15 +1,47 @@
 {
-  "name": "Airflow Pipeline Dev",
+  "name": "Airflow Pipeline Development",
   "dockerFile": "Dockerfile",
   "workspaceFolder": "/workspace",
-  "extensions": [
-    "ms-python.python",
-    "ms-azuretools.vscode-docker"
-  ],
-  "settings": {
-    "terminal.integrated.shell.linux": "/bin/bash"
+  
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "ms-azuretools.vscode-docker",
+        "redhat.vscode-yaml",
+        "ms-python.black-formatter",
+        "ms-python.flake8"
+      ],
+      "settings": {
+        "terminal.integrated.shell.linux": "/bin/bash",
+        "python.defaultInterpreterPath": "/usr/local/bin/python",
+        "python.linting.enabled": true,
+        "python.linting.flake8Enabled": true,
+        "python.formatting.provider": "black",
+        "editor.formatOnSave": true,
+        "files.autoSave": "afterDelay"
+      }
+    }
   },
+  
   "mounts": [
     "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached"
-  ]
+  ],
+  
+  "forwardPorts": [8080, 5432],
+  "portsAttributes": {
+    "8080": {
+      "label": "Airflow Web UI",
+      "onAutoForward": "notify"
+    },
+    "5432": {
+      "label": "PostgreSQL",
+      "onAutoForward": "silent"
+    }
+  },
+  
+  "postCreateCommand": "pip install -r requirements.txt",
+  
+  "remoteUser": "root"
 }
