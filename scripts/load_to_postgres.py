@@ -1,5 +1,5 @@
 import pandas as pd
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 import os
 
 DB_CONN = os.getenv(
@@ -47,20 +47,37 @@ def merge_and_load(ratings_csv, movies_csv):
     
     engine = create_engine(DB_CONN)
     
-    # Write to database (replace if exists)
+    # Write to database (replace if exists) with explicit connection and transaction
     table_name = 'movie_ratings_merged'
-    merged.to_sql(table_name, engine, if_exists='replace', index=False)
     
-    print(f"  ✅ Wrote {len(merged)} rows to table: {table_name}")
-    
-    # Verify write
-    verify_query = f"SELECT COUNT(*) FROM {table_name}"
-    with engine.connect() as conn:
-        result = conn.execute(verify_query).fetchone()
-        row_count = result[0]
-        print(f"  ✓ Verification: {row_count} rows in database")
-    
-    return True
+    try:
+        # Use begin() for automatic transaction commit
+        with engine.begin() as conn:
+            merged.to_sql(table_name, conn, if_exists='replace', index=False, method='multi')
+            print(f"  ✅ Wrote {len(merged)} rows to table: {table_name}")
+        
+        # Verify write in a separate transaction to ensure data is committed
+        print(f"  🔍 Verifying data was written...")
+        with engine.connect() as conn:
+            result = conn.execute(text(f"SELECT COUNT(*) FROM {table_name}")).fetchone()
+            row_count = result[0]
+            print(f"  ✓ Verification: {row_count} rows in database")
+            
+            if row_count != len(merged):
+                raise ValueError(f"Row count mismatch! Expected {len(merged)}, got {row_count}")
+            
+            # Also verify we can read some sample data
+            sample = conn.execute(text(f"SELECT * FROM {table_name} LIMIT 5")).fetchall()
+            print(f"  ✓ Sample data retrieved: {len(sample)} rows")
+        
+        print(f"  ✅ Database load successful!")
+        return True
+        
+    except Exception as e:
+        print(f"  ❌ Error loading to database: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        raise
 
 
 if __name__ == "__main__":
