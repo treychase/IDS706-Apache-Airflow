@@ -18,12 +18,12 @@ airflow db init || airflow db migrate
 # Create admin user
 echo "👤 Creating admin user..."
 airflow users create \
-  --username admin \
-  --password admin \
-  --firstname Admin \
-  --lastname User \
+  --username trchase \
+  --password Dannywins.7 \
+  --firstname Trey \
+  --lastname Chase \
   --role Admin \
-  --email admin@example.com 2>/dev/null || echo "   User already exists"
+  --email tc409@duke.edu 2>/dev/null || echo "   User already exists"
 
 echo "✅ Initialization complete!"
 
