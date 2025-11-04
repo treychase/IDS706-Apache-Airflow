@@ -1,0 +1,34 @@
+[2025-11-04T00:50:26.285+0000] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: openflights_etl_pipeline.merge_and_load_task manual__2025-11-04T00:50:22+00:00 [queued]>
+[2025-11-04T00:50:26.288+0000] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: openflights_etl_pipeline.merge_and_load_task manual__2025-11-04T00:50:22+00:00 [queued]>
+[2025-11-04T00:50:26.288+0000] {taskinstance.py:2170} INFO - Starting attempt 1 of 2
+[2025-11-04T00:50:26.292+0000] {taskinstance.py:2191} INFO - Executing <Task(PythonOperator): merge_and_load_task> on 2025-11-04 00:50:22+00:00
+[2025-11-04T00:50:26.293+0000] {standard_task_runner.py:60} INFO - Started process 379 to run task
+[2025-11-04T00:50:26.295+0000] {standard_task_runner.py:87} INFO - Running: ['***', 'tasks', 'run', 'openflights_etl_pipeline', 'merge_and_load_task', 'manual__2025-11-04T00:50:22+00:00', '--job-id', '5', '--raw', '--subdir', 'DAGS_FOLDER/openflights_pipeline_dag.py', '--cfg-path', '/tmp/tmpwddb553b']
+[2025-11-04T00:50:26.295+0000] {standard_task_runner.py:88} INFO - Job 5: Subtask merge_and_load_task
+[2025-11-04T00:50:26.312+0000] {task_command.py:423} INFO - Running <TaskInstance: openflights_etl_pipeline.merge_and_load_task manual__2025-11-04T00:50:22+00:00 [running]> on host 8f60f9ce8a63
+[2025-11-04T00:50:26.339+0000] {taskinstance.py:2480} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='student' AIRFLOW_CTX_DAG_ID='openflights_etl_pipeline' AIRFLOW_CTX_TASK_ID='merge_and_load_task' AIRFLOW_CTX_EXECUTION_DATE='2025-11-04T00:50:22+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='manual__2025-11-04T00:50:22+00:00'
+[2025-11-04T00:50:26.489+0000] {logging_mixin.py:188} INFO - Merging: /opt/***/data/processed/routes_processed.csv and /opt/***/data/processed/airports_processed.csv
+[2025-11-04T00:50:26.489+0000] {logging_mixin.py:188} INFO - 🔗 Merging datasets...
+[2025-11-04T00:50:26.489+0000] {logging_mixin.py:188} INFO -   🛫 Routes: /opt/***/data/processed/routes_processed.csv
+[2025-11-04T00:50:26.489+0000] {logging_mixin.py:188} INFO -   ✈️  Airports: /opt/***/data/processed/airports_processed.csv
+[2025-11-04T00:50:26.509+0000] {logging_mixin.py:188} INFO -   ✓ Loaded 67240 routes
+[2025-11-04T00:50:26.509+0000] {logging_mixin.py:188} INFO -   ✓ Loaded 7698 airports
+[2025-11-04T00:50:26.509+0000] {logging_mixin.py:188} INFO -   🔗 Merging with source airports...
+[2025-11-04T00:50:26.528+0000] {logging_mixin.py:188} INFO -   ✓ Source airports merged: 67240 rows
+[2025-11-04T00:50:26.528+0000] {logging_mixin.py:188} INFO -   🔗 Merging with destination airports...
+[2025-11-04T00:50:26.548+0000] {logging_mixin.py:188} INFO -   ✓ Destination airports merged: 67240 rows
+[2025-11-04T00:50:26.548+0000] {logging_mixin.py:188} INFO -   ✓ Final columns: ['airline', 'airline_id', 'source_airport_id', 'dest_airport_id', 'stops', 'equipment', 'source_airport_name', 'source_city', 'source_country', 'source_iata', 'source_icao', 'source_latitude', 'source_longitude', 'source_altitude', 'dest_airport_name', 'dest_city', 'dest_country', 'dest_iata', 'dest_icao', 'dest_latitude', 'dest_longitude', 'dest_altitude']
+[2025-11-04T00:50:26.550+0000] {logging_mixin.py:188} INFO -   ⚠️  Warning: 259 routes have no matching source airport
+[2025-11-04T00:50:26.550+0000] {logging_mixin.py:188} INFO -   ⚠️  Warning: 264 routes have no matching destination airport
+[2025-11-04T00:50:26.556+0000] {logging_mixin.py:188} INFO -   ✓ After cleaning: 66771 complete routes
+[2025-11-04T00:50:26.556+0000] {logging_mixin.py:188} INFO - 💾 Loading to PostgreSQL...
+[2025-11-04T00:50:26.557+0000] {logging_mixin.py:188} INFO -   Database: postgres:5432/***
+[2025-11-04T00:50:39.486+0000] {logging_mixin.py:188} INFO -   ✅ Wrote 66771 rows to table: airport_routes_merged
+[2025-11-04T00:50:39.488+0000] {logging_mixin.py:188} INFO -   🔍 Verifying data was written...
+[2025-11-04T00:50:39.492+0000] {logging_mixin.py:188} INFO -   ✓ Verification: 66771 rows in database
+[2025-11-04T00:50:39.493+0000] {logging_mixin.py:188} INFO -   ✓ Sample data retrieved: 5 rows
+[2025-11-04T00:50:39.493+0000] {logging_mixin.py:188} INFO -   ✅ Database load successful!
+[2025-11-04T00:50:39.495+0000] {python.py:201} INFO - Done. Returned value was: True
+[2025-11-04T00:50:39.507+0000] {taskinstance.py:1138} INFO - Marking task as SUCCESS. dag_id=openflights_etl_pipeline, task_id=merge_and_load_task, execution_date=20251104T005022, start_date=20251104T005026, end_date=20251104T005039
+[2025-11-04T00:50:39.535+0000] {local_task_job_runner.py:234} INFO - Task exited with return code 0
+[2025-11-04T00:50:39.546+0000] {taskinstance.py:3280} INFO - 1 downstream tasks scheduled from follow-on schedule check

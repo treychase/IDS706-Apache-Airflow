@@ -1,0 +1,72 @@
+[2025-11-04T01:18:47.385+0000] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: openflights_etl_pipeline.analysis_task manual__2025-11-04T01:18:31+00:00 [queued]>
+[2025-11-04T01:18:47.388+0000] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: openflights_etl_pipeline.analysis_task manual__2025-11-04T01:18:31+00:00 [queued]>
+[2025-11-04T01:18:47.388+0000] {taskinstance.py:2170} INFO - Starting attempt 1 of 3
+[2025-11-04T01:18:47.392+0000] {taskinstance.py:2191} INFO - Executing <Task(PythonOperator): analysis_task> on 2025-11-04 01:18:31+00:00
+[2025-11-04T01:18:47.394+0000] {standard_task_runner.py:60} INFO - Started process 336 to run task
+[2025-11-04T01:18:47.395+0000] {standard_task_runner.py:87} INFO - Running: ['***', 'tasks', 'run', 'openflights_etl_pipeline', 'analysis_task', 'manual__2025-11-04T01:18:31+00:00', '--job-id', '26', '--raw', '--subdir', 'DAGS_FOLDER/openflights_pipeline_dag.py', '--cfg-path', '/tmp/tmp6wa2yoeo']
+[2025-11-04T01:18:47.396+0000] {standard_task_runner.py:88} INFO - Job 26: Subtask analysis_task
+[2025-11-04T01:18:47.414+0000] {task_command.py:423} INFO - Running <TaskInstance: openflights_etl_pipeline.analysis_task manual__2025-11-04T01:18:31+00:00 [running]> on host 4913d2343cee
+[2025-11-04T01:18:47.444+0000] {taskinstance.py:2480} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='student' AIRFLOW_CTX_DAG_ID='openflights_etl_pipeline' AIRFLOW_CTX_TASK_ID='analysis_task' AIRFLOW_CTX_EXECUTION_DATE='2025-11-04T01:18:31+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='manual__2025-11-04T01:18:31+00:00'
+[2025-11-04T01:18:47.444+0000] {logging_mixin.py:188} INFO - 
+================================================================================
+[2025-11-04T01:18:47.444+0000] {logging_mixin.py:188} INFO - TASK: ANALYSIS
+[2025-11-04T01:18:47.444+0000] {logging_mixin.py:188} INFO - ================================================================================
+[2025-11-04T01:18:47.747+0000] {font_manager.py:1547} INFO - generated new fontManager
+[2025-11-04T01:18:47.832+0000] {logging_mixin.py:188} INFO - 
+================================================================================
+[2025-11-04T01:18:47.832+0000] {logging_mixin.py:188} INFO - 📊 RUNNING ANALYSIS
+[2025-11-04T01:18:47.832+0000] {logging_mixin.py:188} INFO - ================================================================================
+[2025-11-04T01:18:47.833+0000] {logging_mixin.py:188} INFO -   ✓ Connected to database
+[2025-11-04T01:18:47.837+0000] {logging_mixin.py:188} INFO -   ✓ Table 'airport_routes_merged' exists
+[2025-11-04T01:18:47.837+0000] {logging_mixin.py:188} INFO -   📖 Reading data from 'airport_routes_merged'...
+[2025-11-04T01:18:48.206+0000] {logging_mixin.py:188} INFO -   ✓ Loaded 66,771 routes
+[2025-11-04T01:18:48.206+0000] {logging_mixin.py:188} INFO -   ✓ Columns (22): ['airline', 'airline_id', 'source_airport_id', 'dest_airport_id', 'stops', 'equipment', 'source_airport_name', 'source_city']... (showing first 8)
+[2025-11-04T01:18:48.206+0000] {logging_mixin.py:188} INFO - 
+  📏 Calculating route distances...
+[2025-11-04T01:18:48.209+0000] {logging_mixin.py:188} INFO -   ✓ Distances calculated
+[2025-11-04T01:18:48.209+0000] {logging_mixin.py:188} INFO -      Mean: 1,856 km
+[2025-11-04T01:18:48.209+0000] {logging_mixin.py:188} INFO -      Max: 16,082 km
+[2025-11-04T01:18:48.209+0000] {logging_mixin.py:188} INFO - 
+  📊 Creating visualizations...
+[2025-11-04T01:18:48.230+0000] {logging_mixin.py:188} INFO -      Creating plot 1: Top airlines...
+[2025-11-04T01:18:48.245+0000] {logging_mixin.py:188} INFO -      Creating plot 2: Routes by country...
+[2025-11-04T01:18:48.258+0000] {logging_mixin.py:188} INFO -      Creating plot 3: Distance distribution...
+[2025-11-04T01:18:48.277+0000] {logging_mixin.py:188} INFO -      Creating plot 4: Busiest airports...
+[2025-11-04T01:18:48.698+0000] {logging_mixin.py:188} INFO -   ✅ Saved visualization to: /opt/***/data/analysis/airport_analysis.png
+[2025-11-04T01:18:48.698+0000] {logging_mixin.py:188} INFO - 
+  📊 SUMMARY STATISTICS
+[2025-11-04T01:18:48.698+0000] {logging_mixin.py:188} INFO - --------------------------------------------------------------------------------
+[2025-11-04T01:18:48.698+0000] {logging_mixin.py:188} INFO -   Total routes: 66,771
+[2025-11-04T01:18:48.702+0000] {logging_mixin.py:188} INFO -   Unique airlines: 566
+[2025-11-04T01:18:48.703+0000] {logging_mixin.py:188} INFO -   Unique source airports: 3,199
+[2025-11-04T01:18:48.703+0000] {logging_mixin.py:188} INFO -   Unique destination airports: 3,196
+[2025-11-04T01:18:48.708+0000] {logging_mixin.py:188} INFO -   Unique countries (source): 225
+[2025-11-04T01:18:48.708+0000] {logging_mixin.py:188} INFO -   Direct flights (0 stops): 66,760 (100.0%)
+[2025-11-04T01:18:48.709+0000] {logging_mixin.py:188} INFO - 
+  Distance Statistics:
+[2025-11-04T01:18:48.709+0000] {logging_mixin.py:188} INFO -     Mean: 1,856 km
+[2025-11-04T01:18:48.710+0000] {logging_mixin.py:188} INFO -     Median: 1,199 km
+[2025-11-04T01:18:48.710+0000] {logging_mixin.py:188} INFO -     Min: 0 km
+[2025-11-04T01:18:48.710+0000] {logging_mixin.py:188} INFO -     Max: 16,082 km
+[2025-11-04T01:18:48.710+0000] {logging_mixin.py:188} INFO - 
+  🏆 Top 5 Airlines:
+[2025-11-04T01:18:48.714+0000] {logging_mixin.py:188} INFO -     1. FR                                      : 2,484 routes
+[2025-11-04T01:18:48.714+0000] {logging_mixin.py:188} INFO -     2. AA                                      : 2,352 routes
+[2025-11-04T01:18:48.714+0000] {logging_mixin.py:188} INFO -     3. UA                                      : 2,178 routes
+[2025-11-04T01:18:48.714+0000] {logging_mixin.py:188} INFO -     4. DL                                      : 1,981 routes
+[2025-11-04T01:18:48.714+0000] {logging_mixin.py:188} INFO -     5. US                                      : 1,960 routes
+[2025-11-04T01:18:48.714+0000] {logging_mixin.py:188} INFO - 
+  🌍 Top 5 Countries:
+[2025-11-04T01:18:48.718+0000] {logging_mixin.py:188} INFO -     1. United States                           : 13,021 routes
+[2025-11-04T01:18:48.718+0000] {logging_mixin.py:188} INFO -     2. China                                   : 8,174 routes
+[2025-11-04T01:18:48.719+0000] {logging_mixin.py:188} INFO -     3. United Kingdom                          : 2,661 routes
+[2025-11-04T01:18:48.719+0000] {logging_mixin.py:188} INFO -     4. Spain                                   : 2,530 routes
+[2025-11-04T01:18:48.719+0000] {logging_mixin.py:188} INFO -     5. Germany                                 : 2,352 routes
+[2025-11-04T01:18:48.719+0000] {logging_mixin.py:188} INFO - 
+✅ ANALYSIS COMPLETE!
+[2025-11-04T01:18:48.719+0000] {logging_mixin.py:188} INFO - ================================================================================
+[2025-11-04T01:18:48.737+0000] {logging_mixin.py:188} INFO - ✅ Analysis completed! Plot saved to: /opt/***/data/analysis/airport_analysis.png
+[2025-11-04T01:18:48.737+0000] {python.py:201} INFO - Done. Returned value was: /opt/***/data/analysis/airport_analysis.png
+[2025-11-04T01:18:48.749+0000] {taskinstance.py:1138} INFO - Marking task as SUCCESS. dag_id=openflights_etl_pipeline, task_id=analysis_task, execution_date=20251104T011831, start_date=20251104T011847, end_date=20251104T011848
+[2025-11-04T01:18:48.796+0000] {local_task_job_runner.py:234} INFO - Task exited with return code 0
+[2025-11-04T01:18:48.806+0000] {taskinstance.py:3280} INFO - 1 downstream tasks scheduled from follow-on schedule check

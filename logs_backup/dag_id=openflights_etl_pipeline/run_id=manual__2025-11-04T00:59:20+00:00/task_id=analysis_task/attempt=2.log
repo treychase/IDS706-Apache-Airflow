@@ -1,0 +1,26 @@
+[2025-11-04T01:01:38.984+0000] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: openflights_etl_pipeline.analysis_task manual__2025-11-04T00:59:20+00:00 [queued]>
+[2025-11-04T01:01:38.986+0000] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: openflights_etl_pipeline.analysis_task manual__2025-11-04T00:59:20+00:00 [queued]>
+[2025-11-04T01:01:38.987+0000] {taskinstance.py:2170} INFO - Starting attempt 2 of 2
+[2025-11-04T01:01:38.991+0000] {taskinstance.py:2191} INFO - Executing <Task(PythonOperator): analysis_task> on 2025-11-04 00:59:20+00:00
+[2025-11-04T01:01:38.993+0000] {standard_task_runner.py:60} INFO - Started process 365 to run task
+[2025-11-04T01:01:38.995+0000] {standard_task_runner.py:87} INFO - Running: ['***', 'tasks', 'run', 'openflights_etl_pipeline', 'analysis_task', 'manual__2025-11-04T00:59:20+00:00', '--job-id', '14', '--raw', '--subdir', 'DAGS_FOLDER/openflights_pipeline_dag.py', '--cfg-path', '/tmp/tmpagp5mxeo']
+[2025-11-04T01:01:38.996+0000] {standard_task_runner.py:88} INFO - Job 14: Subtask analysis_task
+[2025-11-04T01:01:39.016+0000] {task_command.py:423} INFO - Running <TaskInstance: openflights_etl_pipeline.analysis_task manual__2025-11-04T00:59:20+00:00 [running]> on host 43019d6e422f
+[2025-11-04T01:01:39.049+0000] {taskinstance.py:2480} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='student' AIRFLOW_CTX_DAG_ID='openflights_etl_pipeline' AIRFLOW_CTX_TASK_ID='analysis_task' AIRFLOW_CTX_EXECUTION_DATE='2025-11-04T00:59:20+00:00' AIRFLOW_CTX_TRY_NUMBER='2' AIRFLOW_CTX_DAG_RUN_ID='manual__2025-11-04T00:59:20+00:00'
+[2025-11-04T01:01:39.337+0000] {taskinstance.py:2698} ERROR - Task failed with exception
+Traceback (most recent call last):
+  File "/home/airflow/.local/lib/python3.8/site-packages/airflow/models/taskinstance.py", line 433, in _execute_task
+    result = execute_callable(context=context, **execute_callable_kwargs)
+  File "/home/airflow/.local/lib/python3.8/site-packages/airflow/operators/python.py", line 199, in execute
+    return_value = self.execute_callable()
+  File "/home/airflow/.local/lib/python3.8/site-packages/airflow/operators/python.py", line 216, in execute_callable
+    return self.python_callable(*self.op_args, **self.op_kwargs)
+  File "/opt/airflow/dags/openflights_pipeline_dag.py", line 66, in _analysis
+    import analysis_read_and_plot as analysis
+  File "/opt/airflow/scripts/analysis_read_and_plot.py", line 8, in <module>
+    import seaborn as sns
+ModuleNotFoundError: No module named 'seaborn'
+[2025-11-04T01:01:39.341+0000] {taskinstance.py:1138} INFO - Marking task as FAILED. dag_id=openflights_etl_pipeline, task_id=analysis_task, execution_date=20251104T005920, start_date=20251104T010138, end_date=20251104T010139
+[2025-11-04T01:01:39.345+0000] {standard_task_runner.py:107} ERROR - Failed to execute job 14 for task analysis_task (No module named 'seaborn'; 365)
+[2025-11-04T01:01:39.392+0000] {local_task_job_runner.py:234} INFO - Task exited with return code 1
+[2025-11-04T01:01:39.403+0000] {taskinstance.py:3280} INFO - 0 downstream tasks scheduled from follow-on schedule check

@@ -1,0 +1,35 @@
+[2025-11-04T01:18:33.166+0000] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: openflights_etl_pipeline.transform_group.transform_airports_task manual__2025-11-04T01:18:31+00:00 [queued]>
+[2025-11-04T01:18:33.169+0000] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: openflights_etl_pipeline.transform_group.transform_airports_task manual__2025-11-04T01:18:31+00:00 [queued]>
+[2025-11-04T01:18:33.169+0000] {taskinstance.py:2170} INFO - Starting attempt 1 of 3
+[2025-11-04T01:18:33.173+0000] {taskinstance.py:2191} INFO - Executing <Task(PythonOperator): transform_group.transform_airports_task> on 2025-11-04 01:18:31+00:00
+[2025-11-04T01:18:33.175+0000] {standard_task_runner.py:60} INFO - Started process 328 to run task
+[2025-11-04T01:18:33.177+0000] {standard_task_runner.py:87} INFO - Running: ['***', 'tasks', 'run', 'openflights_etl_pipeline', 'transform_group.transform_airports_task', 'manual__2025-11-04T01:18:31+00:00', '--job-id', '23', '--raw', '--subdir', 'DAGS_FOLDER/openflights_pipeline_dag.py', '--cfg-path', '/tmp/tmpc2cycsh3']
+[2025-11-04T01:18:33.177+0000] {standard_task_runner.py:88} INFO - Job 23: Subtask transform_group.transform_airports_task
+[2025-11-04T01:18:33.196+0000] {task_command.py:423} INFO - Running <TaskInstance: openflights_etl_pipeline.transform_group.transform_airports_task manual__2025-11-04T01:18:31+00:00 [running]> on host 4913d2343cee
+[2025-11-04T01:18:33.228+0000] {taskinstance.py:2480} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='student' AIRFLOW_CTX_DAG_ID='openflights_etl_pipeline' AIRFLOW_CTX_TASK_ID='transform_group.transform_airports_task' AIRFLOW_CTX_EXECUTION_DATE='2025-11-04T01:18:31+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='manual__2025-11-04T01:18:31+00:00'
+[2025-11-04T01:18:33.228+0000] {logging_mixin.py:188} INFO - 
+================================================================================
+[2025-11-04T01:18:33.228+0000] {logging_mixin.py:188} INFO - TASK: TRANSFORM AIRPORTS
+[2025-11-04T01:18:33.229+0000] {logging_mixin.py:188} INFO - ================================================================================
+[2025-11-04T01:18:33.441+0000] {logging_mixin.py:188} INFO - Input: /opt/***/data/airports.dat
+[2025-11-04T01:18:33.441+0000] {logging_mixin.py:188} INFO - 
+================================================================================
+[2025-11-04T01:18:33.442+0000] {logging_mixin.py:188} INFO - ✈️  TRANSFORMING AIRPORTS
+[2025-11-04T01:18:33.442+0000] {logging_mixin.py:188} INFO - ================================================================================
+[2025-11-04T01:18:33.442+0000] {logging_mixin.py:188} INFO - Input: /opt/***/data/airports.dat
+[2025-11-04T01:18:33.442+0000] {logging_mixin.py:188} INFO -   ✓ Input file size: 1,127,225 bytes
+[2025-11-04T01:18:33.459+0000] {logging_mixin.py:188} INFO -   ✓ Loaded 7698 airports
+[2025-11-04T01:18:33.461+0000] {logging_mixin.py:188} INFO -   ✓ Countries: 237
+[2025-11-04T01:18:33.461+0000] {logging_mixin.py:188} INFO -   ✓ Columns: ['airport_id', 'name', 'city', 'country', 'iata', 'icao', 'latitude', 'longitude', 'altitude', 'timezone', 'dst', 'tz_database', 'type', 'source']
+[2025-11-04T01:18:33.463+0000] {logging_mixin.py:188} INFO -   ✓ After removing rows without ID/name: 7698 (0 removed)
+[2025-11-04T01:18:33.465+0000] {logging_mixin.py:188} INFO -   ✓ After removing rows without coordinates: 7698 (0 removed)
+[2025-11-04T01:18:33.465+0000] {logging_mixin.py:188} INFO -   ✓ Final dataset: 7698 airports with valid coordinates
+[2025-11-04T01:18:33.466+0000] {logging_mixin.py:188} INFO -   ✓ Sample: Goroka Airport, Goroka, Papua New Guinea
+[2025-11-04T01:18:33.483+0000] {logging_mixin.py:188} INFO -   ✅ Saved to: /opt/***/data/processed/airports_processed.csv
+[2025-11-04T01:18:33.483+0000] {logging_mixin.py:188} INFO -   ✅ Output size: 692,335 bytes
+[2025-11-04T01:18:33.483+0000] {logging_mixin.py:188} INFO - ================================================================================
+[2025-11-04T01:18:33.484+0000] {logging_mixin.py:188} INFO - ✅ Transformed airports saved to: /opt/***/data/processed/airports_processed.csv
+[2025-11-04T01:18:33.484+0000] {python.py:201} INFO - Done. Returned value was: /opt/***/data/processed/airports_processed.csv
+[2025-11-04T01:18:33.493+0000] {taskinstance.py:1138} INFO - Marking task as SUCCESS. dag_id=openflights_etl_pipeline, task_id=transform_group.transform_airports_task, execution_date=20251104T011831, start_date=20251104T011833, end_date=20251104T011833
+[2025-11-04T01:18:33.530+0000] {local_task_job_runner.py:234} INFO - Task exited with return code 0
+[2025-11-04T01:18:33.540+0000] {taskinstance.py:3280} INFO - 0 downstream tasks scheduled from follow-on schedule check

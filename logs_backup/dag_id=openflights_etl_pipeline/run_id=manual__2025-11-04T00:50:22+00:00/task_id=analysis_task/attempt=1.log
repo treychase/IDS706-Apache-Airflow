@@ -1,0 +1,68 @@
+[2025-11-04T00:50:40.259+0000] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: openflights_etl_pipeline.analysis_task manual__2025-11-04T00:50:22+00:00 [queued]>
+[2025-11-04T00:50:40.262+0000] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: openflights_etl_pipeline.analysis_task manual__2025-11-04T00:50:22+00:00 [queued]>
+[2025-11-04T00:50:40.262+0000] {taskinstance.py:2170} INFO - Starting attempt 1 of 2
+[2025-11-04T00:50:40.266+0000] {taskinstance.py:2191} INFO - Executing <Task(PythonOperator): analysis_task> on 2025-11-04 00:50:22+00:00
+[2025-11-04T00:50:40.268+0000] {standard_task_runner.py:60} INFO - Started process 387 to run task
+[2025-11-04T00:50:40.269+0000] {standard_task_runner.py:87} INFO - Running: ['***', 'tasks', 'run', 'openflights_etl_pipeline', 'analysis_task', 'manual__2025-11-04T00:50:22+00:00', '--job-id', '6', '--raw', '--subdir', 'DAGS_FOLDER/openflights_pipeline_dag.py', '--cfg-path', '/tmp/tmpkwxrjhzb']
+[2025-11-04T00:50:40.270+0000] {standard_task_runner.py:88} INFO - Job 6: Subtask analysis_task
+[2025-11-04T00:50:40.291+0000] {task_command.py:423} INFO - Running <TaskInstance: openflights_etl_pipeline.analysis_task manual__2025-11-04T00:50:22+00:00 [running]> on host 8f60f9ce8a63
+[2025-11-04T00:50:40.321+0000] {taskinstance.py:2480} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='student' AIRFLOW_CTX_DAG_ID='openflights_etl_pipeline' AIRFLOW_CTX_TASK_ID='analysis_task' AIRFLOW_CTX_EXECUTION_DATE='2025-11-04T00:50:22+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='manual__2025-11-04T00:50:22+00:00'
+[2025-11-04T00:50:40.649+0000] {font_manager.py:1547} INFO - generated new fontManager
+[2025-11-04T00:50:40.754+0000] {logging_mixin.py:188} INFO - 📊 Running analysis...
+[2025-11-04T00:50:40.754+0000] {logging_mixin.py:188} INFO -   Database: postgres:5432/***
+[2025-11-04T00:50:40.754+0000] {logging_mixin.py:188} INFO -   📖 Reading from table: airport_routes_merged
+[2025-11-04T00:50:41.100+0000] {logging_mixin.py:188} INFO -   ✓ Loaded 66771 routes from database
+[2025-11-04T00:50:41.100+0000] {logging_mixin.py:188} INFO -   ✓ Columns: ['airline', 'airline_id', 'source_airport_id', 'dest_airport_id', 'stops', 'equipment', 'source_airport_name', 'source_city', 'source_country', 'source_iata', 'source_icao', 'source_latitude', 'source_longitude', 'source_altitude', 'dest_airport_name', 'dest_city', 'dest_country', 'dest_iata', 'dest_icao', 'dest_latitude', 'dest_longitude', 'dest_altitude']
+[2025-11-04T00:50:41.100+0000] {logging_mixin.py:188} INFO -   📏 Calculating route distances...
+[2025-11-04T00:50:41.104+0000] {logging_mixin.py:188} INFO -   📈 Analyzing busiest airports...
+[2025-11-04T00:50:41.126+0000] {logging_mixin.py:188} INFO - 
+  🏆 Top 10 Busiest Airports (by number of outgoing routes):
+[2025-11-04T00:50:41.126+0000] {logging_mixin.py:188} INFO -   ================================================================================
+[2025-11-04T00:50:41.126+0000] {logging_mixin.py:188} INFO -   Hartsfield Jackson Atlanta Internat (Atlanta, United States) | 🛫 915 routes | 📏 Avg: 1641km
+[2025-11-04T00:50:41.126+0000] {logging_mixin.py:188} INFO -   Chicago O'Hare International Airpor (Chicago, United States) | 🛫 558 routes | 📏 Avg: 2561km
+[2025-11-04T00:50:41.126+0000] {logging_mixin.py:188} INFO -   Beijing Capital International Airpo (Beijing, China) | 🛫 531 routes | 📏 Avg: 2830km
+[2025-11-04T00:50:41.126+0000] {logging_mixin.py:188} INFO -   London Heathrow Airport             (London, United Kingdom) | 🛫 525 routes | 📏 Avg: 4550km
+[2025-11-04T00:50:41.126+0000] {logging_mixin.py:188} INFO -   Charles de Gaulle International Air (Paris, France) | 🛫 524 routes | 📏 Avg: 3803km
+[2025-11-04T00:50:41.126+0000] {logging_mixin.py:188} INFO -   Frankfurt am Main Airport           (Frankfurt, Germany) | 🛫 497 routes | 📏 Avg: 3577km
+[2025-11-04T00:50:41.126+0000] {logging_mixin.py:188} INFO -   Los Angeles International Airport   (Los Angeles, United States) | 🛫 489 routes | 📏 Avg: 4031km
+[2025-11-04T00:50:41.126+0000] {logging_mixin.py:188} INFO -   Dallas Fort Worth International Air (Dallas-Fort Worth, United States) | 🛫 469 routes | 📏 Avg: 2267km
+[2025-11-04T00:50:41.126+0000] {logging_mixin.py:188} INFO -   John F Kennedy International Airpor (New York, United States) | 🛫 456 routes | 📏 Avg: 4339km
+[2025-11-04T00:50:41.127+0000] {logging_mixin.py:188} INFO -   Amsterdam Airport Schiphol          (Amsterdam, Netherlands) | 🛫 453 routes | 📏 Avg: 3228km
+[2025-11-04T00:50:41.127+0000] {logging_mixin.py:188} INFO -   ================================================================================
+[2025-11-04T00:50:41.127+0000] {logging_mixin.py:188} INFO - 
+  📊 Creating busiest airports visualization...
+[2025-11-04T00:50:41.146+0000] {logging_mixin.py:188} INFO -   📊 Creating route distance distribution...
+[2025-11-04T00:50:41.428+0000] {logging_mixin.py:188} INFO -   ✅ Saved visualization to: /opt/***/data/analysis/airport_analysis.png
+[2025-11-04T00:50:41.429+0000] {logging_mixin.py:188} INFO - 
+  📊 Dataset Statistics:
+[2025-11-04T00:50:41.429+0000] {logging_mixin.py:188} INFO -   • Total routes: 66,771
+[2025-11-04T00:50:41.429+0000] {logging_mixin.py:188} INFO -   • Unique source airports: 3,199
+[2025-11-04T00:50:41.429+0000] {logging_mixin.py:188} INFO -   • Unique destination airports: 3,196
+[2025-11-04T00:50:41.433+0000] {logging_mixin.py:188} INFO -   • Unique airlines: 566
+[2025-11-04T00:50:41.433+0000] {logging_mixin.py:188} INFO -   • Direct flights (0 stops): 66,760 (100.0%)
+[2025-11-04T00:50:41.433+0000] {logging_mixin.py:188} INFO - 
+  📏 Distance Statistics:
+[2025-11-04T00:50:41.433+0000] {logging_mixin.py:188} INFO -   • Average route distance: 1856 km
+[2025-11-04T00:50:41.434+0000] {logging_mixin.py:188} INFO -   • Median route distance: 1199 km
+[2025-11-04T00:50:41.434+0000] {logging_mixin.py:188} INFO -   • Shortest route: 0 km
+[2025-11-04T00:50:41.434+0000] {logging_mixin.py:188} INFO -   • Longest route: 16082 km
+[2025-11-04T00:50:41.445+0000] {logging_mixin.py:188} INFO - 
+  🌍 Longest Route:
+[2025-11-04T00:50:41.446+0000] {logging_mixin.py:188} INFO -   • Kenneth Kaunda International Airport Lusaka (Lusaka, Zambia)
+[2025-11-04T00:50:41.446+0000] {logging_mixin.py:188} INFO -     → Los Alamitos Army Air Field (Solwesi, Zambia)
+[2025-11-04T00:50:41.446+0000] {logging_mixin.py:188} INFO -   • Distance: 16082 km
+[2025-11-04T00:50:41.446+0000] {logging_mixin.py:188} INFO -   • Airline: P0
+[2025-11-04T00:50:41.446+0000] {logging_mixin.py:188} INFO - 
+  ✈️  Top 5 Airlines by Route Count:
+[2025-11-04T00:50:41.450+0000] {logging_mixin.py:188} INFO -   • FR: 2,484 routes
+[2025-11-04T00:50:41.450+0000] {logging_mixin.py:188} INFO -   • AA: 2,352 routes
+[2025-11-04T00:50:41.451+0000] {logging_mixin.py:188} INFO -   • UA: 2,178 routes
+[2025-11-04T00:50:41.451+0000] {logging_mixin.py:188} INFO -   • DL: 1,981 routes
+[2025-11-04T00:50:41.451+0000] {logging_mixin.py:188} INFO -   • US: 1,960 routes
+[2025-11-04T00:50:41.451+0000] {logging_mixin.py:188} INFO - 
+  ✅ Analysis complete!
+[2025-11-04T00:50:41.469+0000] {logging_mixin.py:188} INFO - Analysis completed and plot saved
+[2025-11-04T00:50:41.469+0000] {python.py:201} INFO - Done. Returned value was: None
+[2025-11-04T00:50:41.475+0000] {taskinstance.py:1138} INFO - Marking task as SUCCESS. dag_id=openflights_etl_pipeline, task_id=analysis_task, execution_date=20251104T005022, start_date=20251104T005040, end_date=20251104T005041
+[2025-11-04T00:50:41.503+0000] {local_task_job_runner.py:234} INFO - Task exited with return code 0
+[2025-11-04T00:50:41.512+0000] {taskinstance.py:3280} INFO - 1 downstream tasks scheduled from follow-on schedule check
