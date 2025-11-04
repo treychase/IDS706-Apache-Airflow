@@ -2,6 +2,21 @@
 
 A production-grade data orchestration pipeline built with Apache Airflow that ingests, transforms, and analyzes flight route data from the OpenFlights database.
 
+# Screenshots
+
+## DAG Pass
+![E850729D-D501-4A9A-BB00-278E43B0CC69_1_105_c](https://github.com/user-attachments/assets/012739d5-20cb-479e-9990-645434bc32b6)
+
+![3598C0DC-8E6A-4A13-A445-52808C927F1A_1_105_c](https://github.com/user-attachments/assets/0b92b12f-9167-4c5a-8ef4-b084099831f1)
+
+![20674A0A-39E8-49F1-A3ED-9830BAD835D2_4_5005_c](https://github.com/user-attachments/assets/db1b6375-edc0-4c46-ace2-24d604c1ad58)
+
+## Analysis
+
+![FFE835F6-B950-4857-8618-119FE0812D79_1_105_c](https://github.com/user-attachments/assets/faa8bac6-e666-4ff5-9835-d4836d626153)
+
+
+
 ## 📋 Project Overview
 
 This project implements an end-to-end ETL (Extract, Transform, Load) pipeline that:
@@ -11,7 +26,7 @@ This project implements an end-to-end ETL (Extract, Transform, Load) pipeline th
 - Conducts geospatial analysis and generates visualizations
 - Cleans up intermediate files automatically
 
-**Dataset**: [OpenFlights](https://openflights.org/data.html) - Comprehensive flight route and airport database
+**Dataset**: Openflights - Comprehensive flight route and airport database
 
 ## 🏗️ Architecture
 
