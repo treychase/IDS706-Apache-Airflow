@@ -288,4 +288,3 @@ For questions or feedback, please open an issue on GitHub.
 
 ---
 
-**Note**: Replace `YOUR_USERNAME` and `YOUR_REPO` with your actual GitHub username and repository name throughout this file.
