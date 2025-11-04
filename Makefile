@@ -1,9 +1,9 @@
-# Makefile for MovieLens Airflow ETL pipeline
+# Makefile for OpenFlights Airflow ETL pipeline
 # Usage:
 #   make build       → Build Docker images
 #   make up          → Start Airflow & Postgres
 #   make init        → Initialize Airflow database and user
-#   make trigger     → Trigger the MovieLens DAG
+#   make trigger     → Trigger the OpenFlights DAG
 #   make down        → Stop containers
 #   make logs        → View Airflow logs
 #   make lint        → Lint Python code
@@ -16,18 +16,24 @@ AIRFLOW_DAG = openflights_etl_pipeline
 AIRFLOW_CONTAINER = airflow
 POSTGRES_CONTAINER = postgres
 
-.PHONY: build up down clean init trigger lint logs status restart db-connect help
+.PHONY: build up down clean init trigger lint logs status restart db-connect help troubleshoot setup-dirs
 
 # ------------------------------------------------------------------------------
 # Main commands
 # ------------------------------------------------------------------------------
 
-build:
+setup-dirs:
+	@echo "📁 Creating required directories..."
+	@mkdir -p logs data data/analysis data/processed
+	@chmod 777 logs data
+	@echo "✅ Directories created!"
+
+build: setup-dirs
 	@echo "🔧 Building Docker images..."
 	docker-compose build
 	@echo "✅ Build complete!"
 
-up:
+up: setup-dirs
 	@echo "🚀 Starting Airflow and Postgres..."
 	docker-compose up -d
 	@echo "⏳ Waiting for services to initialize (60 seconds)..."
@@ -81,8 +87,8 @@ db-connect:
 	docker exec -it $(POSTGRES_CONTAINER) psql -U airflow -d airflow
 
 db-query:
-	@echo "🔍 Querying movie_ratings_merged table..."
-	@docker exec -it $(POSTGRES_CONTAINER) psql -U airflow -d airflow -c "SELECT COUNT(*) as total_rows FROM movie_ratings_merged;" 2>/dev/null || echo "❌ Table not created yet. Run the DAG first."
+	@echo "🔍 Querying airport_routes_merged table..."
+	@docker exec -it $(POSTGRES_CONTAINER) psql -U airflow -d airflow -c "SELECT COUNT(*) as total_rows FROM airport_routes_merged;" 2>/dev/null || echo "❌ Table not created yet. Run the DAG first."
 
 list-dags:
 	@echo "📋 Available DAGs:"
@@ -91,6 +97,27 @@ list-dags:
 dag-status:
 	@echo "📊 DAG Status: $(AIRFLOW_DAG)"
 	@docker exec -it $(AIRFLOW_CONTAINER) airflow dags list | grep $(AIRFLOW_DAG) || echo "❌ DAG not found"
+
+get-plot:
+	@echo "📊 Copying visualization from container..."
+	@docker cp $(AIRFLOW_CONTAINER):/opt/airflow/data/analysis/airport_analysis.png ./airport_analysis.png 2>/dev/null && echo "✅ Saved to: ./airport_analysis.png" || echo "❌ Plot not found. Run the DAG first with 'make trigger'"
+
+troubleshoot:
+	@echo "🔍 Running troubleshooter..."
+	@echo ""
+	@echo "1. Checking containers..."
+	@docker ps | grep -E "(airflow|postgres)" || echo "❌ Containers not running!"
+	@echo ""
+	@echo "2. Checking data files..."
+	@docker exec -it $(AIRFLOW_CONTAINER) ls -lh /opt/airflow/data/ 2>/dev/null || echo "❌ No data directory"
+	@echo ""
+	@echo "3. Checking database..."
+	@docker exec -it $(POSTGRES_CONTAINER) psql -U airflow -d airflow -c "SELECT COUNT(*) FROM airport_routes_merged;" 2>/dev/null || echo "❌ Table doesn't exist"
+	@echo ""
+	@echo "4. Checking DAG runs..."
+	@docker exec -it $(AIRFLOW_CONTAINER) airflow dags list-runs -d $(AIRFLOW_DAG) 2>/dev/null | head -5 || echo "❌ No runs"
+	@echo ""
+	@echo "📝 Check Airflow UI: http://localhost:8080"
 
 lint:
 	@echo "🧪 Running code linting..."
@@ -127,7 +154,12 @@ clean-data:
 	rm -rf data/
 	@echo "✅ Data cleaned!"
 
-clean-all: clean clean-data
+clean-logs:
+	@echo "🗑️  Removing logs directory..."
+	rm -rf logs/
+	@echo "✅ Logs cleaned!"
+
+clean-all: clean clean-data clean-logs
 	@echo "🧹 Full cleanup complete!"
 
 # ------------------------------------------------------------------------------
@@ -135,9 +167,10 @@ clean-all: clean clean-data
 # ------------------------------------------------------------------------------
 
 help:
-	@echo "📖 MovieLens Airflow ETL Pipeline - Available Commands"
+	@echo "📖 OpenFlights Airflow ETL Pipeline - Available Commands"
 	@echo ""
 	@echo "Setup & Start:"
+	@echo "  make setup-dirs   - Create required directories"
 	@echo "  make build        - Build Docker images"
 	@echo "  make up           - Start services (Airflow + PostgreSQL)"
 	@echo "  make init         - Initialize Airflow DB and create admin user"
@@ -145,14 +178,16 @@ help:
 	@echo "  make restart      - Restart all services"
 	@echo ""
 	@echo "Pipeline Operations:"
-	@echo "  make trigger      - Trigger the MovieLens DAG"
+	@echo "  make trigger      - Trigger the OpenFlights DAG"
 	@echo "  make list-dags    - List all available DAGs"
-	@echo "  make dag-status   - Check MovieLens DAG status"
+	@echo "  make dag-status   - Check OpenFlights DAG status"
+	@echo "  make get-plot     - Copy visualization from container"
 	@echo ""
 	@echo "Monitoring:"
 	@echo "  make status       - Show service status"
 	@echo "  make logs         - Stream Airflow logs"
 	@echo "  make logs-all     - Stream all logs"
+	@echo "  make troubleshoot - Run diagnostic checks"
 	@echo ""
 	@echo "Database:"
 	@echo "  make db-connect   - Connect to PostgreSQL CLI"
@@ -165,6 +200,7 @@ help:
 	@echo "Cleanup:"
 	@echo "  make clean        - Remove containers and volumes"
 	@echo "  make clean-data   - Remove data directory"
+	@echo "  make clean-logs   - Remove logs directory"
 	@echo "  make clean-all    - Full cleanup"
 	@echo ""
 	@echo "Quick Start:"
@@ -172,6 +208,7 @@ help:
 	@echo "  2. make up"
 	@echo "  3. make init"
 	@echo "  4. make trigger"
-	@echo "  5. Visit http://localhost:8080 (admin/admin)"
+	@echo "  5. make get-plot"
+	@echo "  6. Visit http://localhost:8080 (admin/admin)"
 
 .DEFAULT_GOAL := help

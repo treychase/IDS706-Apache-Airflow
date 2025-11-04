@@ -1,4 +1,3 @@
-version: '3.7'
 services:
   postgres:
     image: postgres:14
@@ -36,10 +35,9 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      - airflow_logs:/opt/airflow/logs
-      - airflow_data:/opt/airflow/data
+      # Use bind mounts so files are visible on host
+      - ./logs:/opt/airflow/logs
+      - ./data:/opt/airflow/data
 
 volumes:
   postgres_data:
-  airflow_logs:
-  airflow_data:
