@@ -11,8 +11,8 @@
 #   make status      → Check service status
 #   make restart     → Restart services
 
-PROJECT_NAME = movielens_airflow
-AIRFLOW_DAG = movielens_etl_pipeline
+PROJECT_NAME = openflights_airflow
+AIRFLOW_DAG = openflights_etl_pipeline
 AIRFLOW_CONTAINER = airflow
 POSTGRES_CONTAINER = postgres
 

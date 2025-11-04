@@ -1,63 +1,58 @@
 import requests
-import zipfile
-import os
 from pathlib import Path
 
 DATA_DIR = Path('/opt/airflow/data')
 DATA_DIR.mkdir(parents=True, exist_ok=True)
 
-MOVIELENS_100K_URL = "http://files.grouplens.org/datasets/movielens/ml-100k.zip"
+AIRPORTS_URL = "https://raw.githubusercontent.com/jpatokal/openflights/master/data/airports.dat"
+ROUTES_URL = "https://raw.githubusercontent.com/jpatokal/openflights/master/data/routes.dat"
 
-def download_movielens_100k():
+def download_openflights():
     """
-    Downloads and extracts MovieLens 100K dataset.
-    Returns dictionary with paths to ratings and movies files.
+    Downloads OpenFlights airport and route datasets.
+    Returns dictionary with paths to airports and routes files.
     """
-    local_zip = DATA_DIR / 'ml-100k.zip'
-    extract_dir = DATA_DIR / 'ml-100k'
+    airports_file = DATA_DIR / 'airports.dat'
+    routes_file = DATA_DIR / 'routes.dat'
     
-    # Download if not cached
-    if not local_zip.exists():
-        print(f"📥 Downloading MovieLens 100K from {MOVIELENS_100K_URL}")
-        r = requests.get(MOVIELENS_100K_URL, stream=True)
+    # Download airports
+    if not airports_file.exists():
+        print(f"📥 Downloading airports from {AIRPORTS_URL}")
+        r = requests.get(AIRPORTS_URL)
         r.raise_for_status()
-        with open(local_zip, 'wb') as f:
-            for chunk in r.iter_content(chunk_size=8192):
-                f.write(chunk)
-        print(f"✅ Downloaded to {local_zip}")
+        airports_file.write_text(r.text, encoding='utf-8')
+        print(f"✅ Downloaded to {airports_file}")
     else:
-        print(f"✅ Using cached {local_zip}")
+        print(f"✅ Using cached {airports_file}")
     
-    # Extract
-    if not extract_dir.exists():
-        print(f"📦 Extracting to {extract_dir}")
-        with zipfile.ZipFile(local_zip, 'r') as z:
-            z.extractall(DATA_DIR)
-        print("✅ Extraction complete")
+    # Download routes
+    if not routes_file.exists():
+        print(f"📥 Downloading routes from {ROUTES_URL}")
+        r = requests.get(ROUTES_URL)
+        r.raise_for_status()
+        routes_file.write_text(r.text, encoding='utf-8')
+        print(f"✅ Downloaded to {routes_file}")
     else:
-        print(f"✅ Already extracted to {extract_dir}")
-
+        print(f"✅ Using cached {routes_file}")
+    
     # Verify files exist
-    ratings_file = extract_dir / 'ml-100k' / 'u.data'
-    movies_file = extract_dir / 'ml-100k' / 'u.item'
+    if not airports_file.exists():
+        raise FileNotFoundError(f"Airports file not found: {airports_file}")
+    if not routes_file.exists():
+        raise FileNotFoundError(f"Routes file not found: {routes_file}")
     
-    if not ratings_file.exists():
-        raise FileNotFoundError(f"Ratings file not found: {ratings_file}")
-    if not movies_file.exists():
-        raise FileNotFoundError(f"Movies file not found: {movies_file}")
-    
-    print(f"📊 Ratings file: {ratings_file}")
-    print(f"🎬 Movies file: {movies_file}")
+    print(f"✈️  Airports file: {airports_file}")
+    print(f"🛫 Routes file: {routes_file}")
     
     return {
-        'ratings': str(ratings_file),
-        'movies': str(movies_file)
+        'airports': str(airports_file),
+        'routes': str(routes_file)
     }
 
 
 if __name__ == "__main__":
     # Test the download function
-    paths = download_movielens_100k()
+    paths = download_openflights()
     print(f"\n✅ Download successful!")
-    print(f"Ratings: {paths['ratings']}")
-    print(f"Movies: {paths['movies']}")
+    print(f"Airports: {paths['airports']}")
+    print(f"Routes: {paths['routes']}")

@@ -8,38 +8,99 @@ DB_CONN = os.getenv(
 )
 
 
-def merge_and_load(ratings_csv, movies_csv):
+def merge_and_load(routes_csv, airports_csv):
     """
-    Merge ratings and movies datasets, then load to PostgreSQL.
+    Merge routes and airports datasets, then load to PostgreSQL.
+    
+    Merges routes with airports TWICE:
+    1. Once for source airport details
+    2. Once for destination airport details
     
     Args:
-        ratings_csv: Path to processed ratings CSV
-        movies_csv: Path to processed movies CSV
+        routes_csv: Path to processed routes CSV
+        airports_csv: Path to processed airports CSV
     
     Returns:
         Boolean indicating success
     """
     print(f"🔗 Merging datasets...")
-    print(f"  📊 Ratings: {ratings_csv}")
-    print(f"  🎬 Movies: {movies_csv}")
+    print(f"  🛫 Routes: {routes_csv}")
+    print(f"  ✈️  Airports: {airports_csv}")
     
     # Read processed CSV files
-    ratings = pd.read_csv(ratings_csv)
-    movies = pd.read_csv(movies_csv)
+    routes = pd.read_csv(routes_csv)
+    airports = pd.read_csv(airports_csv)
     
-    print(f"  ✓ Loaded {len(ratings)} ratings")
-    print(f"  ✓ Loaded {len(movies)} movies")
+    print(f"  ✓ Loaded {len(routes)} routes")
+    print(f"  ✓ Loaded {len(airports)} airports")
     
-    # Merge on movieId
-    merged = ratings.merge(movies, on='movieId', how='left')
+    # Merge routes with source airports
+    print(f"  🔗 Merging with source airports...")
+    merged = routes.merge(
+        airports,
+        left_on='source_airport_id',
+        right_on='airport_id',
+        how='left',
+        suffixes=('', '_src')
+    )
     
-    print(f"  ✓ Merged dataset: {len(merged)} rows")
-    print(f"  ✓ Columns: {list(merged.columns)}")
+    # Rename source airport columns
+    merged = merged.rename(columns={
+        'name': 'source_airport_name',
+        'city': 'source_city',
+        'country': 'source_country',
+        'iata': 'source_iata',
+        'icao': 'source_icao',
+        'latitude': 'source_latitude',
+        'longitude': 'source_longitude',
+        'altitude': 'source_altitude'
+    })
+    
+    # Drop the extra airport_id column from merge
+    merged = merged.drop(columns=['airport_id'])
+    
+    print(f"  ✓ Source airports merged: {len(merged)} rows")
+    
+    # Merge with destination airports
+    print(f"  🔗 Merging with destination airports...")
+    merged = merged.merge(
+        airports,
+        left_on='dest_airport_id',
+        right_on='airport_id',
+        how='left',
+        suffixes=('', '_dst')
+    )
+    
+    # Rename destination airport columns
+    merged = merged.rename(columns={
+        'name': 'dest_airport_name',
+        'city': 'dest_city',
+        'country': 'dest_country',
+        'iata': 'dest_iata',
+        'icao': 'dest_icao',
+        'latitude': 'dest_latitude',
+        'longitude': 'dest_longitude',
+        'altitude': 'dest_altitude'
+    })
+    
+    # Drop the extra airport_id column from merge
+    merged = merged.drop(columns=['airport_id'])
+    
+    print(f"  ✓ Destination airports merged: {len(merged)} rows")
+    print(f"  ✓ Final columns: {list(merged.columns)}")
     
     # Verify merge quality
-    null_titles = merged['title'].isna().sum()
-    if null_titles > 0:
-        print(f"  ⚠️  Warning: {null_titles} ratings have no matching movie")
+    null_source = merged['source_airport_name'].isna().sum()
+    null_dest = merged['dest_airport_name'].isna().sum()
+    
+    if null_source > 0:
+        print(f"  ⚠️  Warning: {null_source} routes have no matching source airport")
+    if null_dest > 0:
+        print(f"  ⚠️  Warning: {null_dest} routes have no matching destination airport")
+    
+    # Remove routes with missing airport data
+    merged = merged.dropna(subset=['source_airport_name', 'dest_airport_name'])
+    print(f"  ✓ After cleaning: {len(merged)} complete routes")
     
     # Connect to PostgreSQL and load data
     print(f"💾 Loading to PostgreSQL...")
@@ -48,7 +109,7 @@ def merge_and_load(ratings_csv, movies_csv):
     engine = create_engine(DB_CONN)
     
     # Write to database (replace if exists) with explicit connection and transaction
-    table_name = 'movie_ratings_merged'
+    table_name = 'airport_routes_merged'
     
     try:
         # Use begin() for automatic transaction commit
@@ -85,10 +146,10 @@ if __name__ == "__main__":
     import sys
     
     if len(sys.argv) > 2:
-        ratings_path = sys.argv[1]
-        movies_path = sys.argv[2]
-        success = merge_and_load(ratings_path, movies_path)
+        routes_path = sys.argv[1]
+        airports_path = sys.argv[2]
+        success = merge_and_load(routes_path, airports_path)
         if success:
             print("\n✅ Merge and load successful!")
     else:
-        print("Usage: python load_to_postgres.py <ratings_csv> <movies_csv>")
+        print("Usage: python load_to_postgres.py <routes_csv> <airports_csv>")

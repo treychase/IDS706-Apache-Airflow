@@ -1,258 +1,211 @@
-# MovieLens Airflow ETL Pipeline
+# MovieLens Pipeline Fix Documentation
 
-## Overview
-This repository contains an Apache Airflow pipeline that demonstrates end-to-end data orchestration with parallel processing, database integration, and analysis. The pipeline processes the MovieLens 100K dataset to showcase ETL best practices.
+## Problem Diagnosis
 
-## Pipeline Architecture
+The pipeline was not creating the `movie_ratings_merged` table in PostgreSQL. This could be due to:
 
-### Workflow Steps
-1. **Data Ingestion**: Downloads MovieLens 100K dataset (movies and ratings)
-2. **Parallel Transformation**: Transforms ratings and movies datasets simultaneously using TaskGroup
-3. **Data Merging & Loading**: Combines transformed datasets and loads into PostgreSQL
-4. **Analysis**: Reads from database and generates visualization of top-rated movies
-5. **Cleanup**: Removes intermediate processed files
+1. **Transaction not being committed properly** - SQLAlchemy transactions need explicit handling
+2. **Silent failures** - Insufficient error logging made it hard to diagnose
+3. **Data validation issues** - Missing checks for file existence and data integrity
 
-### Key Features
-- ✅ **Scheduled DAG**: Runs daily (`@daily` schedule)
-- ✅ **Parallel Processing**: Transform tasks execute concurrently via TaskGroup
-- ✅ **XCom for File Paths**: No actual data passed between tasks, only file paths
-- ✅ **PostgreSQL Integration**: Final merged dataset stored in relational database
-- ✅ **Data Analysis**: Generates visualization from database query
-- ✅ **Cleanup Task**: Removes intermediate files after pipeline completion
-- ✅ **Containerized Development**: Includes Dockerfile and devcontainer.json
+## Solution: Improved Scripts
 
-## Prerequisites
-- Docker
-- Docker Compose
-- 4GB+ available RAM
+I've created **3 improved scripts** with better error handling, verbose logging, and explicit transaction management:
 
-## Quick Start
+### 1. `transform_and_merge_fixed.py`
+**Improvements:**
+- ✅ File existence validation
+- ✅ Detailed data quality checks
+- ✅ Sample data display for debugging
+- ✅ Output file verification
+- ✅ Genre statistics and validation
+- ✅ Standalone test mode
 
-### Option 1: Using Make (Recommended)
+### 2. `load_to_postgres_fixed.py`
+**Improvements:**
+- ✅ Explicit DROP TABLE before write (ensures clean state)
+- ✅ Separate transactions for write and verify
+- ✅ Row count verification after write
+- ✅ Column structure validation
+- ✅ Sample data retrieval to confirm write
+- ✅ Better error messages
+
+### 3. `test_pipeline.py`
+**Improvements:**
+- ✅ End-to-end pipeline test outside Airflow
+- ✅ Step-by-step execution with detailed logging
+- ✅ Database verification with statistics
+- ✅ Helps identify exactly where failures occur
+
+## How to Apply the Fixes
+
+### Option 1: Replace Files in Production (Recommended)
+
 ```bash
-# Build Docker images
-make build
+# Copy fixed files to the scripts directory
+cp /home/claude/transform_and_merge_fixed.py /mnt/user-data/outputs/transform_and_merge.py
+cp /home/claude/load_to_postgres_fixed.py /mnt/user-data/outputs/load_to_postgres.py
+cp /home/claude/test_pipeline.py /mnt/user-data/outputs/test_pipeline.py
 
-# Start Airflow and PostgreSQL
-make up
+# Then manually copy these to your scripts/ directory on the host machine
+# and rebuild the containers
+```
 
-# Initialize Airflow (create admin user)
-make init
+### Option 2: Test First, Then Deploy
 
-# Trigger the DAG
-make trigger
+```bash
+# 1. Copy test script to outputs
+cp /home/claude/test_pipeline.py /mnt/user-data/outputs/
 
-# View logs
-make logs
+# 2. On your host machine, copy it to the project
+cp data/outputs/test_pipeline.py scripts/
 
-# Stop services
+# 3. Run the test inside the Airflow container
+docker exec -it airflow python /opt/airflow/scripts/test_pipeline.py
+
+# 4. If successful, replace the original scripts
+cp /home/claude/transform_and_merge_fixed.py /mnt/user-data/outputs/transform_and_merge.py
+cp /home/claude/load_to_postgres_fixed.py /mnt/user-data/outputs/load_to_postgres.py
+
+# 5. Copy to your host scripts/ directory
+# 6. Rebuild and restart
 make down
-
-# Clean everything
-make clean
+make build
+make up
+make trigger
 ```
 
-### Option 2: Manual Docker Compose
+## Quick Diagnostic Commands
+
+### Check if files were created:
 ```bash
-# Start services
-docker-compose up --build -d
-
-# Wait for services to initialize (30-60 seconds)
-sleep 60
-
-# Create admin user
-docker exec -it airflow bash -c "airflow users create --username admin --password admin --firstname Admin --lastname User --role Admin --email admin@example.com"
-
-# Access Airflow UI
-# Navigate to http://localhost:8080
-# Login: admin / admin
+docker exec -it airflow ls -lh /opt/airflow/data/processed/
 ```
 
-## Accessing the Pipeline
-
-1. **Airflow UI**: http://localhost:8080
-   - Username: `admin`
-   - Password: `admin`
-
-2. **Enable and Trigger DAG**:
-   - Find `movielens_etl_pipeline` in the DAGs list
-   - Toggle the DAG to "On"
-   - Click the play button to trigger manually
-
-3. **Monitor Execution**:
-   - View the Graph view to see task dependencies
-   - Check individual task logs for detailed output
-
-## Project Structure
-
-```
-.
-├── dags/
-│   └── movielens_pipeline_dag.py      # Main Airflow DAG definition
-├── scripts/
-│   ├── download_datasets.py            # Downloads MovieLens data
-│   ├── transform_and_merge.py          # Transforms ratings & movies
-│   ├── load_to_postgres.py             # Merges and loads to DB
-│   └── analysis_read_and_plot.py       # Reads from DB and creates viz
-├── sql/
-│   └── schema.sql                      # Database schema reference
-├── devcontainer/
-│   └── devcontainer.json               # VS Code dev container config
-├── Dockerfile                          # Custom dev container image
-├── docker-compose.yml                  # Orchestrates Airflow + Postgres
-├── requirements.txt                    # Python dependencies
-├── Makefile                            # Automation commands
-└── README.md                           # This file
+### Check database directly:
+```bash
+docker exec -it postgres psql -U airflow -d airflow -c "SELECT COUNT(*) FROM movie_ratings_merged;"
 ```
 
-## DAG Task Flow
-
-```
-download_task
-      ↓
-transform_group (parallel execution)
-├── transform_ratings_task
-└── transform_movies_task
-      ↓
-merge_and_load_task
-      ↓
-analysis_task
-      ↓
-cleanup_task
+### Run test pipeline:
+```bash
+docker exec -it airflow python /opt/airflow/scripts/test_pipeline.py
 ```
 
-## Database Schema
+### Check Airflow task logs:
+```bash
+docker exec -it airflow airflow tasks test movielens_etl_pipeline merge_and_load_task 2025-11-04
+```
 
-The pipeline creates and populates the following table in PostgreSQL:
+## Key Differences from Original
 
-**movie_ratings_merged**
-- `userId` (INTEGER)
-- `movieId` (INTEGER)
-- `rating` (REAL)
-- `timestamp` (BIGINT)
-- `title` (TEXT)
-- `genres` (TEXT)
-
-## Output Files
-
-All outputs are stored in `/opt/airflow/data/` (mounted from `./data/` locally):
-
-- **Raw Data**: `data/ml-100k/` (original dataset)
-- **Processed Data**: `data/processed/` (intermediate files - cleaned up after pipeline)
-- **Analysis**: `data/analysis/top10_avg_rated_movies.png` (visualization)
-
-## Assignment Requirements Checklist
-
-### 1. Deploy Airflow and Create DAG with Schedule ✅
-- DAG scheduled to run `@daily`
-- Includes TaskGroup for organizing related tasks
-- Start date: November 4, 2025
-
-### 2. Data Ingestion and Transformation ✅
-- **Two related datasets**: Movies (u.item) and Ratings (u.data)
-- **Transformations applied**: 
-  - Ratings: Parse tab-separated values, clean columns
-  - Movies: Parse pipe-separated values, extract genres
-- **TaskGroup**: `transform_group` contains parallel transform tasks
-- **Database**: Final merged data loaded into PostgreSQL
-
-### 3. Analysis ✅
-- Reads data from PostgreSQL database
-- Analyzes top 10 movies by average rating (minimum 10 ratings)
-- Creates bar chart visualization
-- Cleanup task removes intermediate processed files
-
-### 4. Documentation ✅
-- Comprehensive README explaining pipeline
-- Inline code comments in DAG and scripts
-- Clear project structure
-
-## Design Principles
-
-### No Data in XCom
-Following best practices, tasks communicate via file paths only:
+### Original `load_to_postgres.py`:
 ```python
-# Download task returns paths
-return {'ratings': '/path/to/ratings', 'movies': '/path/to/movies'}
-
-# Transform tasks pull paths and return new paths
-ratings_path = ti.xcom_pull(task_ids='download_task')['ratings']
-return '/path/to/processed_ratings'
+with engine.begin() as conn:
+    merged.to_sql(table_name, conn, if_exists='replace', index=False, method='multi')
 ```
 
-### Parallelism
-The `transform_group` TaskGroup allows both transform operations to run simultaneously, reducing total pipeline execution time. Configure parallelism in docker-compose:
-```yaml
-AIRFLOW__CORE__PARALLELISM: "32"
-AIRFLOW__CORE__MAX_ACTIVE_TASKS_PER_DAG: "16"
+### Fixed `load_to_postgres.py`:
+```python
+# Drop table first
+with engine.begin() as conn:
+    conn.execute(text(f"DROP TABLE IF EXISTS {table_name}"))
+
+# Write in separate transaction
+with engine.begin() as conn:
+    merged.to_sql(table_name, conn, if_exists='replace', 
+                  index=False, method='multi', chunksize=1000)
+
+# Verify in fresh connection
+with engine.connect() as conn:
+    result = conn.execute(text(f"SELECT COUNT(*) FROM {table_name}")).fetchone()
+    # Validate result matches expected
+```
+
+## What the Fixes Address
+
+1. **Explicit Transaction Control**: Drops existing table first, ensuring clean state
+2. **Verification**: Confirms data was written with separate SELECT query
+3. **Detailed Logging**: Shows exactly what's happening at each step
+4. **Error Handling**: Better exception messages and stack traces
+5. **Data Validation**: Checks file existence, column names, row counts
+
+## Expected Output
+
+When the fixed scripts run successfully, you should see:
+
+```
+🔗 Merging datasets...
+  ✓ Loaded 100000 ratings
+  ✓ Loaded 1682 movies
+  ✓ Merged dataset: 100000 rows
+💾 Loading to PostgreSQL...
+  ✓ Dropped existing table (if any)
+  ✓ Wrote 100000 rows to table: movie_ratings_merged
+🔍 Verifying data was written...
+  ✓ Table 'movie_ratings_merged' exists in database
+  ✓ Verification: 100,000 rows in database
+  ✅ Database load successful!
 ```
 
 ## Troubleshooting
 
-### Airflow UI Not Loading
-```bash
-# Check container logs
-docker logs airflow
+### If you still don't see the table:
 
-# Restart services
-docker-compose restart
+1. **Check Airflow logs**:
+   ```bash
+   make logs
+   ```
+
+2. **Run the test script**:
+   ```bash
+   docker exec -it airflow python /opt/airflow/scripts/test_pipeline.py
+   ```
+
+3. **Check database connection**:
+   ```bash
+   docker exec -it postgres psql -U airflow -d airflow -c "\dt"
+   ```
+
+4. **Verify files were downloaded**:
+   ```bash
+   docker exec -it airflow ls -lh /opt/airflow/data/ml-100k/ml-100k/
+   ```
+
+### Common Issues:
+
+1. **Permission errors**: Run `chmod -R 777 data/ logs/` on host
+2. **Database not ready**: Wait 60s after `make up` before running `make trigger`
+3. **Old data cached**: Run `make clean-all && make build && make up`
+
+## Testing the Fixes
+
+To test without affecting your current setup:
+
+```bash
+# 1. Create test copies in the container
+docker exec -it airflow cp /opt/airflow/scripts/transform_and_merge.py /opt/airflow/scripts/transform_and_merge.backup.py
+docker exec -it airflow cp /opt/airflow/scripts/load_to_postgres.py /opt/airflow/scripts/load_to_postgres.backup.py
+
+# 2. Copy fixed versions (after copying them to container)
+docker cp transform_and_merge_fixed.py airflow:/opt/airflow/scripts/transform_and_merge.py
+docker cp load_to_postgres_fixed.py airflow:/opt/airflow/scripts/load_to_postgres.py
+
+# 3. Trigger DAG
+make trigger
+
+# 4. If it fails, restore backups
+docker exec -it airflow cp /opt/airflow/scripts/transform_and_merge.backup.py /opt/airflow/scripts/transform_and_merge.py
+docker exec -it airflow cp /opt/airflow/scripts/load_to_postgres.backup.py /opt/airflow/scripts/load_to_postgres.py
 ```
 
-### Database Connection Issues
-```bash
-# Verify Postgres is running
-docker ps | grep postgres
+## Summary
 
-# Test connection
-docker exec -it postgres psql -U airflow -d airflow -c "SELECT 1;"
-```
+These fixes provide:
+- ✅ **Explicit transaction management** for reliable database writes
+- ✅ **Comprehensive logging** for easier debugging
+- ✅ **Data validation** at every step
+- ✅ **Verification** that data was actually written
+- ✅ **Test script** to run pipeline outside Airflow
 
-### DAG Not Appearing
-```bash
-# Check for Python errors in DAG file
-docker exec -it airflow airflow dags list
-
-# View DAG parse errors
-docker exec -it airflow airflow dags list-import-errors
-```
-
-### Permission Issues
-```bash
-# Fix permissions for mounted volumes
-sudo chmod -R 777 logs/ data/
-```
-
-## Development Container
-
-This project includes VS Code dev container support:
-
-1. Open folder in VS Code
-2. Install "Remote - Containers" extension
-3. Click "Reopen in Container" when prompted
-4. VS Code will build and attach to the development container
-
-## Screenshots for Submission
-
-Include the following screenshots:
-1. **Successful DAG execution** in Airflow UI (Grid view showing all tasks green)
-2. **DAG graph view** showing task dependencies and parallel execution
-3. **Generated visualization** (`data/analysis/top10_avg_rated_movies.png`)
-
-## Notes
-
-- The pipeline uses the MovieLens 100K dataset (stable, freely available)
-- First run may take 2-3 minutes as it downloads and extracts the dataset
-- Subsequent runs are faster as the dataset is cached
-- The cleanup task only removes intermediate CSV files, not the raw dataset or analysis outputs
-
-## Future Enhancements
-
-- Add data quality checks using Great Expectations
-- Implement PySpark for large-scale transformations (Super Bonus option)
-- Add monitoring and alerting
-- Parameterize dataset size (100K, 1M, 10M, etc.)
-- Implement incremental loading strategy
-
-## License
-
-This is an educational project for Duke University coursework.
+The root cause was likely insufficient transaction handling and lack of verification. The fixed scripts explicitly manage transactions and verify data was committed to the database.
